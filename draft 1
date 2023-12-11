@@ -1,0 +1,45 @@
+# Import necessary libraries and frameworks
+from flask import Flask, request, jsonify
+import tensorflow as tf
+from PIL import Image
+import numpy as np
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Load pre-trained medical diagnosis model (fine-tuned)
+model = tf.keras.models.load_model('path/to/your/model')
+
+# Define endpoint for image upload
+@app.route('/diagnose', methods=['POST'])
+def diagnose():
+    try:
+        # Receive and process the uploaded medical image
+        file = request.files['image']
+        img = Image.open(file.stream).convert("RGB")
+        img = img.resize((224, 224))  # Resize image to match model input size
+        img_array = np.array(img) / 255.0  # Normalize pixel values
+        img_array = np.expand_dims(img_array, axis=0)  # Add batch dimension
+
+        # Perform diagnosis using the loaded model
+        predictions = model.predict(img_array)
+
+        # Convert predictions to human-readable format
+        diagnosis_result = process_predictions(predictions)
+
+        # Return the diagnosis result
+        return jsonify({'diagnosis': diagnosis_result})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+# Utility function to process model predictions
+def process_predictions(predictions):
+    # Implement logic to interpret model predictions and generate a diagnosis result
+    # This could include mapping prediction probabilities to specific medical conditions
+    # For simplicity, you can return a basic result like 'Normal' or 'Abnormal' for demo purposes
+    return 'Normal' if predictions[0][0] > 0.5 else 'Abnormal'
+
+# Run the Flask app
+if __name__ == '__main__':
+    app.run(debug=True)
