@@ -1,0 +1,10 @@
+medical_diagnosis_app/
+├── app/
+│   ├── static/
+│   │   └── styles.css
+│   ├── templates/
+│   │   └── index.html
+│   └── app.py
+├── model/
+│   └── your_pretrained_model.h5
+└── run_app.sh
